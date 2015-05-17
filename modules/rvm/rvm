@@ -1,0 +1,33 @@
+#!/usr/bin/zsh
+
+function rvm_prompt {
+	local prompt=""
+
+	if [[ "$(current_ruby)" != "$(default_ruby)" ]]; then
+		prompt="${prompt}ruby $(current_ruby) "
+	fi
+
+	if [[ "$(current_gemset)" != "(default)" ]]; then
+		prompt="${prompt}$(current_gemset)"
+	fi
+
+	[ -n "$prompt" ] && echo "%{$fg[red]%}${prompt%% }%{$reset_color%}"
+}
+
+function current_gemset {
+	local curr_gemset="$(rvm gemset list | grep "=")"
+	echo ${curr_gemset##???}
+}
+
+function current_ruby {
+	local curr_ruby="$(rvm list rubies | head -n $(($(rvm list rubies | wc -l) - 4)) | grep '=')"
+	echo ${${curr_ruby##???ruby-}%% *}
+}
+
+function default_ruby {
+	local def_ruby="$(rvm list rubies | head -n $(($(rvm list rubies | wc -l) - 4)) | grep '*')"
+	echo ${${def_ruby##???ruby-}%% *}
+}
+
+OUTPUT=rvm_prompt
+# vim: filetype=zsh noexpandtab
