@@ -1,4 +1,4 @@
-#!/usr/bin/zsh
+compdef _rvm rvm
 
 function rvm_prompt {
 	local prompt=""

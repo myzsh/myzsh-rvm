@@ -1,0 +1,111 @@
+#compdef rvm
+
+_rvm () {
+	_gemsets_available() {
+		local -a gemsets
+		gemsets=(
+		$(rvm gemset list | tail -n $(($(rvm gemset list | wc -l) - 2)) | sed 's/^...//g' | sed 's/(default)/default/g')
+		)
+		_describe -t commands "rvm gemsets" gemsets
+	}
+
+	_rubies_installed() {
+		_values 'rubies' $(rvm list rubies | grep -v "#" | grep -v -e '^rvm' | sed '/^$/d' | sed 's/^...ruby-//' | sed 's/\ .*$//')
+	}
+
+	local -a _1st_arguments
+	_1st_arguments=(
+		"alias:lets you set shortcut strings for convenience with 'rvm use'"
+		"autolibs:controls settings for automatically installing dependencies"
+		"cleanup:lets you remove stale source folders"
+		"config-get:display values for RbConfig::CONFIG variables"
+		"cron:manages setup for using ruby in cron tasks"
+		"current:print the *current* ruby version and the name of any gemset being used"
+		"debug:show info plus additional information for common issues"
+		"disk-usage:tells you how much disk space rvm install is using"
+		"do:runs an arbitrary command against specified and/or all rubies"
+		"docs:tools to make installing ri and rdoc documentation easier"
+		"export:temporarily set an environment variable in the current shell"
+		"fetch:performs an archive / src fetch only of the selected ruby"
+		"fix-permissions:repairs broken permissions"
+		"gemdir:display the path to the current gem directory (GEM_HOME)"
+		"gemset:manages gemsets"
+		"get:{head,stable} upgrades rvm to latest head or stable version"
+		"group:tools for managing groups in multiuser installations"
+		"implode:removes the rvm installation completely"
+		"info:show the *current* environment information for current ruby"
+		"install:install one or many ruby versions"
+		"list:show currently installed rubies, interactive output"
+		"migrate:lets you migrate all gemsets from one ruby to another"
+		"mount:install rubies from external locations"
+		"notes:display notes, with operating system specifics"
+		"osx-ssl-certs:helps update certificates for OpenSSL installed by rvm on OSX"
+		"patchset:tools related to managing ruby patchsets"
+		"pkg:install a dependency package"
+		"reinstall:reinstall ruby and runs gem pristine on all gems"
+		"reload:reload rvm source itself (useful after changing rvm source)"
+		"remove:uninstall one or many ruby versions and remove their sources"
+		"repair:lets you repair parts of your environment"
+		"requirements:installs additional OS specific dependencies"
+		"reset:remove current and stored default & system settings"
+		"rubygems:switches the installed version of rubygems for the current ruby"
+		"rvmrc:tools related to managing rvmrc trust and loading"
+		"snapshot:lets you backup / restore an rvm installation in a lightweight manner"
+		"tools:provides general information about the ruby environment"
+		"unexport:undo changes made to the environment by 'rvm export'"
+		"uninstall:uninstall one or many ruby versions, leaves their sources"
+		"upgrade:lets you upgrade from one version of a ruby to another"
+		"use:setup current shell to use a specific ruby version"
+		"user:tools for managing RVM mixed mode in multiuser installations"
+		"version:show the rvm version installed in rvm_path"
+		"wrapper:generates a set of wrapper executables for a given ruby with the specified ruby and gemset combination"
+	)
+
+	if (( $CURRENT == 2 )); then
+		_describe -t commands "rvm subcommand" _1st_arguments
+		return
+	fi
+
+	case "$words[2]" in
+	gemset)
+		if (( $CURRENT == 3 )); then
+			local -a verbs
+			verbs=(
+				"clear"
+				"copy"
+				"create"
+				"delete"
+				"dir"
+				"empty"
+				"export"
+				"gemdir"
+				"globalcache"
+				"import"
+				"install"
+				"list"
+				"list_all"
+				"name"
+				"pristine"
+				"rename"
+				"unpack"
+				"update"
+				"use"
+			)
+			_describe -t commands 'gemset subcommand' verbs
+		else
+			case "$words[3]" in
+			delete|empty|use)
+				_gemsets_available
+			;;
+			esac
+		fi
+	;;
+	use)
+		_rubies_installed
+	;;
+	esac
+
+	return 1
+}
+
+_rvm "$@"
